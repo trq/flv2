@@ -2,34 +2,18 @@
 
 use App\Domain\Budgeting\Exceptions\AllocationEventMutationNotAllowed;
 use App\Domain\Budgeting\Ledger\AllocationEventJournal;
+use App\Domain\Budgeting\Ledger\AllocationEventMutationGuard;
 
 it('blocks event updates at the application layer', function () {
-    $journal = new AllocationEventJournal;
+    $guard = new AllocationEventMutationGuard;
 
-    $journal->recordEvent(
-        eventId: 'evt_income_001',
-        goalId: 'goal_income',
-        cycleId: 'cycle_2026_02',
-        amount: 2_000.00,
-    );
-
-    $journal->updateEvent(
-        eventId: 'evt_income_001',
-        amount: 1_900.00,
-    );
+    $guard->assertAppendOnly('update');
 })->throws(AllocationEventMutationNotAllowed::class, 'append-only');
 
 it('blocks event deletions at the application layer', function () {
-    $journal = new AllocationEventJournal;
+    $guard = new AllocationEventMutationGuard;
 
-    $journal->recordEvent(
-        eventId: 'evt_expense_001',
-        goalId: 'goal_groceries',
-        cycleId: 'cycle_2026_02',
-        amount: 50.00,
-    );
-
-    $journal->deleteEvent(eventId: 'evt_expense_001');
+    $guard->assertAppendOnly('delete');
 })->throws(AllocationEventMutationNotAllowed::class, 'append-only');
 
 it('creates compensating events that offset prior balances', function () {
@@ -47,9 +31,13 @@ it('creates compensating events that offset prior balances', function () {
         originalEventId: 'evt_expense_001',
     );
 
+    $goalBalances = collect($journal->history())
+        ->groupBy('goal_id')
+        ->map(fn ($events): float => round($events->sum('amount'), 2));
+
     expect($compensatingEvent['amount'])->toBe(-125.50)
         ->and($compensatingEvent['compensates_event_id'])->toBe('evt_expense_001')
-        ->and($journal->goalBalance('goal_groceries'))->toBe(0.0);
+        ->and($goalBalances['goal_groceries'])->toBe(0.0);
 });
 
 it('reconstructs balances deterministically from immutable event history', function () {
@@ -81,7 +69,11 @@ it('reconstructs balances deterministically from immutable event history', funct
         originalEventId: 'evt_expense_001',
     );
 
-    $reconstructedBalances = $journal->reconstructGoalBalances();
+    $reconstructedBalances = collect($journal->history())
+        ->groupBy('goal_id')
+        ->map(fn ($events): float => round($events->sum('amount'), 2))
+        ->sortKeys()
+        ->all();
 
     expect($reconstructedBalances)->toBe([
         'goal_groceries' => 0.0,

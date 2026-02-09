@@ -37,6 +37,8 @@ Use this skill when implementing milestone issues in this repository.
    - present uncommitted diff/status for user review in Codex Desktop
    - wait for explicit user approval
 8. Integrate:
+   - All commits must reference the active issue number (for example `#7`).
+   - The issue-closing commit must include `Closes #<number>` in the commit body.
    - `direct-to-main`: commit on `main`, push
    - `branch+PR`: commit, push branch, open one PR linked to one issue (`Closes #<number>`), merge, cleanup branches
 9. Stop and wait for explicit user review/approval before next issue.

@@ -306,6 +306,8 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
   - Run `vendor/bin/pint --dirty --format agent` before any commit.
   - Run `composer analyse` before any commit for PHP-domain changes.
   - Pause before any commit and let the user review the local uncommitted diff in Codex Desktop.
+  - Ensure commit messages reference the active issue number (for example `#7`).
+  - Ensure the commit that closes the issue includes `Closes #<number>` in the commit body.
   - Choose integration mode after user approval:
     - `direct-to-main` (default for low-risk tasks): commit on `main` and push.
     - `branch+PR` (required for high-risk tasks): use a `codex/` branch, open one PR per issue, merge, then cleanup branches.

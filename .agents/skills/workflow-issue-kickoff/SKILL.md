@@ -28,7 +28,10 @@ Use before writing code for a new issue.
 6. Apply Flowly money rule to scope:
    - all money values are signed whole-dollar integers
    - reject decimal/floating-point money handling in new code/tests
-7. Define implementation slice:
+7. Capture commit convention for delivery:
+   - commit messages reference active issue number
+   - closing commit includes `Closes #<number>` in body
+8. Define implementation slice:
    - smallest set of classes/functions needed to pass tests.
 
 ## Deliverable for Kickoff

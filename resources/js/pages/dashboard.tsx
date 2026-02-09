@@ -65,6 +65,7 @@ function formatWholeDollars(amount: number): string {
 export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
     const [snapshot, setSnapshot] = useState<DashboardSnapshot | null>(null);
     const [isLoadingSnapshot, setIsLoadingSnapshot] = useState<boolean>(workspace.widgets_enabled);
+    const [snapshotError, setSnapshotError] = useState<boolean>(false);
 
     useEffect(() => {
         if (!workspace.widgets_enabled) {
@@ -77,6 +78,7 @@ export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
         const loadSnapshot = async () => {
             try {
                 setIsLoadingSnapshot(true);
+                setSnapshotError(false);
 
                 const response = await fetch(workspace.snapshot_url, {
                     headers: {
@@ -93,10 +95,12 @@ export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
 
                 if (!isCancelled) {
                     setSnapshot(payload);
+                    setSnapshotError(false);
                 }
             } catch {
                 if (!isCancelled) {
                     setSnapshot(null);
+                    setSnapshotError(true);
                 }
             } finally {
                 if (!isCancelled) {
@@ -191,6 +195,13 @@ export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
                                             <div className="h-3 animate-pulse rounded-full bg-muted" />
                                             <div className="h-3 w-1/2 animate-pulse rounded-full bg-muted" />
                                         </div>
+                                    ) : snapshotError ? (
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-medium text-destructive">Snapshot unavailable.</p>
+                                            <p className="text-xs text-muted-foreground">
+                                                Unable to load analytics. Retry in a moment.
+                                            </p>
+                                        </div>
                                     ) : (
                                         <>
                                             <div className="space-y-1">
@@ -246,6 +257,8 @@ export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
                                 <CardContent>
                                     {isLoadingSnapshot ? (
                                         <div className="h-20 animate-pulse rounded-xl bg-muted" />
+                                    ) : snapshotError ? (
+                                        <p className="text-sm text-destructive">Unable to load activity timeline.</p>
                                     ) : timelinePoints.length === 0 ? (
                                         <p className="text-sm text-muted-foreground">No events recorded yet.</p>
                                     ) : (
@@ -280,6 +293,8 @@ export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
                                             <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
                                             <div className="h-2 animate-pulse rounded-full bg-muted" />
                                         </div>
+                                    ) : snapshotError ? (
+                                        <p className="text-sm text-destructive">Unable to load cycle progress.</p>
                                     ) : (
                                         <>
                                             <p className="text-sm text-muted-foreground">

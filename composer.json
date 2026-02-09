@@ -75,6 +75,17 @@
             "@test:lint",
             "@php artisan test"
         ],
+        "test:critical-path": [
+            "@php artisan test --compact tests/Unit/AssistantIntentRouterTest.php tests/Unit/AllocationInvariantGuardTest.php tests/Unit/CycleCloseChecklistOrchestratorTest.php",
+            "@php artisan test --compact tests/Feature/DashboardSnapshotControllerTest.php tests/Feature/DashboardTest.php tests/Feature/Auth/AuthenticationTest.php tests/Feature/Auth/SocialAuthenticationTest.php",
+            "@php artisan test --compact tests/Feature/RunBudgetAlertChecksCommandTest.php tests/Feature/AlertNotificationDispatchTest.php"
+        ],
+        "release:gate": [
+            "@test:critical-path",
+            "@analyse",
+            "npm run test:ui",
+            "npm run types"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

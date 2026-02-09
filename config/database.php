@@ -113,6 +113,20 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'mongodb' => [
+            'driver' => 'mongodb',
+            'dsn' => env('MONGODB_URI'),
+            'host' => env('MONGODB_HOST', '127.0.0.1'),
+            'port' => (int) env('MONGODB_PORT', 27018),
+            'database' => env('MONGODB_DATABASE', 'flv2'),
+            'username' => env('MONGODB_USERNAME'),
+            'password' => env('MONGODB_PASSWORD'),
+            'options' => [
+                'database' => env('MONGODB_AUTH_DATABASE', 'admin'),
+                'appname' => env('APP_NAME', 'Laravel'),
+            ],
+        ],
+
     ],
 
     /*

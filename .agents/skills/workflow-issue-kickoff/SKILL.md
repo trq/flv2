@@ -21,10 +21,14 @@ Use before writing code for a new issue.
 4. Decide test scope first:
    - unit vs feature
    - minimum affected files
-5. Apply Flowly money rule to scope:
+5. Classify integration risk and choose delivery path:
+   - low-risk: `direct-to-main`
+   - high-risk: `branch+PR`
+   - high-risk includes schema/auth/security/AI-write-orchestration/cross-domain refactors
+6. Apply Flowly money rule to scope:
    - all money values are signed whole-dollar integers
    - reject decimal/floating-point money handling in new code/tests
-6. Define implementation slice:
+7. Define implementation slice:
    - smallest set of classes/functions needed to pass tests.
 
 ## Deliverable for Kickoff
@@ -38,3 +42,4 @@ Use before writing code for a new issue.
 
 - Pause and ask user if issue scope conflicts with spec.
 - Avoid speculative architecture before first failing tests exist.
+- Default to `direct-to-main` unless change is high-risk or user requests PR.

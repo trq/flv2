@@ -1,24 +1,24 @@
 ---
 name: workflow-post-merge-cleanup
 description: >-
-  Performs the repository's required post-merge cleanup: sync main, delete merged
-  feature branches locally/remotely, prune refs, and prepare the next clean branch.
+  Performs required post-integration cleanup: sync main, clean merged feature
+  branches when PR mode is used, prune refs, and prepare for the next issue.
 ---
 
 # Workflow Post-Merge Cleanup
 
 ## When to Apply
 
-Use immediately after a PR is merged and before starting the next issue.
+Use immediately after integration is complete (direct-to-main or merged PR) and before starting the next issue.
 
 ## Cleanup Steps
 
 1. Sync main:
    - `git checkout main`
    - `git pull --ff-only`
-2. Delete merged remote branch:
+2. If PR mode was used, delete merged remote branch:
    - `git push origin --delete <branch>`
-3. Delete merged local branch:
+3. If PR mode was used, delete merged local branch:
    - `git branch -d <branch>`
    - if constrained by environment policy, use:
      - `git update-ref -d refs/heads/<branch>`
@@ -30,7 +30,7 @@ Use immediately after a PR is merged and before starting the next issue.
 
 ## Start Next Work Item
 
-- Create a fresh issue branch from updated main:
+- If next issue is high-risk or PR-requested, create a fresh issue branch:
   - `git checkout -b codex/issue-<number>-<short-slug>`
 - Before any commit on the next issue, require user local pre-commit diff review in Codex Desktop.
 

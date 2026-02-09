@@ -1,8 +1,8 @@
 ---
 name: workflow-ci-triage
 description: >-
-  Diagnoses and fixes failed GitHub PR checks for this repository using gh CLI,
-  local reproduction, minimal patches, and revalidation before rerunning checks.
+  Diagnoses and fixes failed GitHub checks in this repository (primarily PR mode)
+  using gh CLI, local reproduction, minimal patches, and revalidation.
 ---
 
 # Workflow CI Triage
@@ -44,3 +44,4 @@ Use when a PR has failing CI/lint/test checks.
 - Keep fixes scoped to the active PR/issue.
 - Do not commit before user-approved local pre-commit review.
 - Enforce Flowly money modeling: whole-dollar signed integers only.
+- If work is in direct-to-main mode, still use the same triage steps against failing runs for the pushed commit/branch.

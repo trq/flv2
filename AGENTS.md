@@ -301,20 +301,24 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - Default implementation order is milestone sequence `M1` through `M6`.
 - Work one issue at a time, in numeric issue order within the active milestone unless the user reprioritizes.
 - For each issue:
-  - Create a dedicated branch prefixed with `codex/`.
   - Follow TDD: write or update failing tests first, then implement, then make tests pass.
   - Run only the minimum affected tests using `php artisan test --compact ...`.
-  - Run `vendor/bin/pint --dirty --format agent` before creating the PR.
+  - Run `vendor/bin/pint --dirty --format agent` before any commit.
   - Pause before any commit and let the user review the local uncommitted diff in Codex Desktop.
-  - Only after explicit user approval, commit and open exactly one PR per issue linked to that issue.
-- After opening a PR, stop and wait for explicit user review/approval before starting the next issue.
-- After a PR is merged:
-  - Checkout `main` and pull latest with fast-forward only.
-  - Delete the merged feature branch from `origin`.
-  - Delete the merged local feature branch.
-  - Prune stale remote-tracking refs.
-  - Start the next issue from a fresh `codex/` branch based on updated `main`.
-- Do not batch multiple issues into a single PR unless explicitly requested by the user.
+  - Choose integration mode after user approval:
+    - `direct-to-main` (default for low-risk tasks): commit on `main` and push.
+    - `branch+PR` (required for high-risk tasks): use a `codex/` branch, open one PR per issue, merge, then cleanup branches.
+- High-risk changes must use `branch+PR`:
+  - schema/migration/index or persistence model changes
+  - authentication/authorization/security changes
+  - AI write-action/orchestration behavior changes
+  - broad cross-cutting refactors across multiple domains
+  - any change explicitly requested by user to go via PR
+- In `branch+PR` mode:
+  - Open exactly one PR per issue, linked to that issue.
+  - Stop and wait for explicit user review/approval before starting the next issue.
+  - After merge: sync `main`, delete merged remote/local branches, prune refs.
+- Do not batch multiple issues into a single integration unit (commit or PR) unless explicitly requested by the user.
 - Keep implementation aligned with `/Users/trq/src/trq/flv2/BUDGET_AI_V1_SPEC.md`; if scope conflicts are found, pause and ask the user before proceeding.
 
 ## Money Modeling Rule (Flowly)

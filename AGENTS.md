@@ -294,3 +294,18 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - IMPORTANT: Always use the `search-docs` tool for detailed Laravel Fortify patterns and documentation.
 - IMPORTANT: Activate `developing-with-fortify` skill when working with Fortify authentication features.
 </laravel-boost-guidelines>
+
+## Project Execution Workflow
+
+- Use GitHub milestones and issues as the source of truth for delivery order.
+- Default implementation order is milestone sequence `M1` through `M6`.
+- Work one issue at a time, in numeric issue order within the active milestone unless the user reprioritizes.
+- For each issue:
+  - Create a dedicated branch prefixed with `codex/`.
+  - Follow TDD: write or update failing tests first, then implement, then make tests pass.
+  - Run only the minimum affected tests using `php artisan test --compact ...`.
+  - Run `vendor/bin/pint --dirty --format agent` before creating the PR.
+  - Open exactly one PR per issue and link it to that issue.
+- After opening a PR, stop and wait for explicit user review/approval before starting the next issue.
+- Do not batch multiple issues into a single PR unless explicitly requested by the user.
+- Keep implementation aligned with `/Users/trq/src/trq/flv2/BUDGET_AI_V1_SPEC.md`; if scope conflicts are found, pause and ask the user before proceeding.

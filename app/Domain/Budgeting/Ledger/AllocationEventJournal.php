@@ -3,6 +3,7 @@
 namespace App\Domain\Budgeting\Ledger;
 
 use App\Domain\Budgeting\Exceptions\AllocationEventNotFound;
+use App\Domain\Budgeting\Exceptions\NonWholeDollarAmount;
 
 class AllocationEventJournal
 {
@@ -11,7 +12,7 @@ class AllocationEventJournal
      *   event_id: string,
      *   goal_id: string,
      *   cycle_id: string,
-     *   amount: float,
+     *   amount: int,
      *   compensates_event_id: string|null
      * }>
      */
@@ -22,7 +23,7 @@ class AllocationEventJournal
      *   event_id: string,
      *   goal_id: string,
      *   cycle_id: string,
-     *   amount: float,
+     *   amount: int,
      *   compensates_event_id: string|null
      * }
      */
@@ -30,14 +31,16 @@ class AllocationEventJournal
         string $eventId,
         string $goalId,
         string $cycleId,
-        float $amount,
+        int|float|string $amount,
         ?string $compensatesEventId = null,
     ): array {
+        $validatedAmount = $this->assertWholeDollarAmount($amount);
+
         $event = [
             'event_id' => $eventId,
             'goal_id' => $goalId,
             'cycle_id' => $cycleId,
-            'amount' => round($amount, 2),
+            'amount' => $validatedAmount,
             'compensates_event_id' => $compensatesEventId,
         ];
 
@@ -51,7 +54,7 @@ class AllocationEventJournal
      *   event_id: string,
      *   goal_id: string,
      *   cycle_id: string,
-     *   amount: float,
+     *   amount: int,
      *   compensates_event_id: string|null
      * }
      */
@@ -73,7 +76,7 @@ class AllocationEventJournal
      *   event_id: string,
      *   goal_id: string,
      *   cycle_id: string,
-     *   amount: float,
+     *   amount: int,
      *   compensates_event_id: string|null
      * }>
      */
@@ -87,7 +90,7 @@ class AllocationEventJournal
      *   event_id: string,
      *   goal_id: string,
      *   cycle_id: string,
-     *   amount: float,
+     *   amount: int,
      *   compensates_event_id: string|null
      * }
      */
@@ -100,5 +103,14 @@ class AllocationEventJournal
         }
 
         throw AllocationEventNotFound::forEventId($eventId);
+    }
+
+    private function assertWholeDollarAmount(int|float|string $amount): int
+    {
+        if (! is_int($amount)) {
+            throw NonWholeDollarAmount::forField('amount', $amount);
+        }
+
+        return $amount;
     }
 }

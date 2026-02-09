@@ -7,8 +7,8 @@ use DomainException;
 class InsufficientPoolFunds extends DomainException
 {
     public static function forAllocation(
-        float $availablePoolAmount,
-        float $requestedAllocationAmount,
+        int $availablePoolAmount,
+        int $requestedAllocationAmount,
     ): self {
         $shortfallAmount = $requestedAllocationAmount - $availablePoolAmount;
 
@@ -20,8 +20,8 @@ class InsufficientPoolFunds extends DomainException
         ));
     }
 
-    private static function formatCurrency(float $amount): string
+    private static function formatCurrency(int $amount): string
     {
-        return '$'.number_format($amount, 2, '.', ',');
+        return '$'.number_format($amount, 0, '.', ',');
     }
 }

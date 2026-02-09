@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
@@ -11,15 +12,123 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+type DashboardSnapshot = {
+    income_allocation: {
+        planned: {
+            expenses: number;
+            savings: number;
+            total: number;
+        };
+        actual: {
+            expenses: number;
+            savings: number;
+            total: number;
+        };
+        income_pool_balance: number;
+    };
+    activity_timeline: {
+        points: Array<{
+            date: string;
+            amount: number;
+        }>;
+    };
+    cycle_progress: {
+        day: number;
+        total_days: number;
+        percent: number;
+    };
+};
+
 type DashboardWorkspaceProps = {
     workspace: {
         layout: string;
         chat_panel_enabled: boolean;
         widgets_enabled: boolean;
+        snapshot_url: string;
     };
 };
 
+function asPercent(part: number, total: number): number {
+    if (total <= 0) {
+        return 0;
+    }
+
+    return Math.max(0, Math.min(100, Math.round((part / total) * 100)));
+}
+
+function formatWholeDollars(amount: number): string {
+    return `$${Math.trunc(amount).toLocaleString()}`;
+}
+
 export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
+    const [snapshot, setSnapshot] = useState<DashboardSnapshot | null>(null);
+    const [isLoadingSnapshot, setIsLoadingSnapshot] = useState<boolean>(workspace.widgets_enabled);
+
+    useEffect(() => {
+        if (!workspace.widgets_enabled) {
+            return;
+        }
+
+        let isCancelled = false;
+        const controller = new AbortController();
+
+        const loadSnapshot = async () => {
+            try {
+                setIsLoadingSnapshot(true);
+
+                const response = await fetch(workspace.snapshot_url, {
+                    headers: {
+                        Accept: 'application/json',
+                    },
+                    signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Unable to load dashboard snapshot.');
+                }
+
+                const payload = (await response.json()) as DashboardSnapshot;
+
+                if (!isCancelled) {
+                    setSnapshot(payload);
+                }
+            } catch {
+                if (!isCancelled) {
+                    setSnapshot(null);
+                }
+            } finally {
+                if (!isCancelled) {
+                    setIsLoadingSnapshot(false);
+                }
+            }
+        };
+
+        void loadSnapshot();
+
+        return () => {
+            isCancelled = true;
+            controller.abort();
+        };
+    }, [workspace.snapshot_url, workspace.widgets_enabled]);
+
+    const timelinePoints = snapshot?.activity_timeline.points ?? [];
+
+    const maxTimelineAmount = useMemo(() => {
+        return Math.max(1, ...timelinePoints.map((point) => point.amount));
+    }, [timelinePoints]);
+
+    const plannedExpenses = snapshot?.income_allocation.planned.expenses ?? 0;
+    const plannedSavings = snapshot?.income_allocation.planned.savings ?? 0;
+    const plannedTotal = snapshot?.income_allocation.planned.total ?? 0;
+
+    const actualExpenses = snapshot?.income_allocation.actual.expenses ?? 0;
+    const actualSavings = snapshot?.income_allocation.actual.savings ?? 0;
+    const actualTotal = snapshot?.income_allocation.actual.total ?? 0;
+
+    const cycleDay = snapshot?.cycle_progress.day ?? 0;
+    const cycleTotalDays = snapshot?.cycle_progress.total_days ?? 0;
+    const cyclePercent = snapshot?.cycle_progress.percent ?? 0;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -64,29 +173,93 @@ export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
                             <Card className="border-sidebar-border/70 py-4">
                                 <CardHeader>
                                     <CardTitle>Income Allocation</CardTitle>
+                                    <CardDescription>
+                                        Planned vs actual totals with current income pool balance.
+                                    </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
-                                    <div className="h-3 overflow-hidden rounded-full bg-muted">
-                                        <div className="h-full w-7/12 bg-emerald-500/70" />
-                                    </div>
-                                    <div className="h-3 overflow-hidden rounded-full bg-muted">
-                                        <div className="h-full w-5/12 bg-amber-500/70" />
-                                    </div>
+                                    {isLoadingSnapshot ? (
+                                        <div className="space-y-3">
+                                            <div className="h-3 animate-pulse rounded-full bg-muted" />
+                                            <div className="h-3 animate-pulse rounded-full bg-muted" />
+                                            <div className="h-3 w-1/2 animate-pulse rounded-full bg-muted" />
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="space-y-1">
+                                                <p className="text-xs uppercase tracking-wide text-muted-foreground">Planned</p>
+                                                <div className="flex h-3 overflow-hidden rounded-full bg-muted">
+                                                    <div
+                                                        className="h-full bg-emerald-500/70"
+                                                        style={{ width: `${asPercent(plannedExpenses, plannedTotal)}%` }}
+                                                    />
+                                                    <div
+                                                        className="h-full bg-amber-500/70"
+                                                        style={{ width: `${asPercent(plannedSavings, plannedTotal)}%` }}
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Expenses {formatWholeDollars(plannedExpenses)} | Savings{' '}
+                                                    {formatWholeDollars(plannedSavings)}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-xs uppercase tracking-wide text-muted-foreground">Actual</p>
+                                                <div className="flex h-3 overflow-hidden rounded-full bg-muted">
+                                                    <div
+                                                        className="h-full bg-sky-500/70"
+                                                        style={{ width: `${asPercent(actualExpenses, actualTotal)}%` }}
+                                                    />
+                                                    <div
+                                                        className="h-full bg-indigo-500/70"
+                                                        style={{ width: `${asPercent(actualSavings, actualTotal)}%` }}
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Expenses {formatWholeDollars(actualExpenses)} | Savings{' '}
+                                                    {formatWholeDollars(actualSavings)}
+                                                </p>
+                                            </div>
+                                            <p className="text-sm font-medium text-foreground">
+                                                Pool Balance:{' '}
+                                                {formatWholeDollars(
+                                                    snapshot?.income_allocation.income_pool_balance ?? 0,
+                                                )}
+                                            </p>
+                                        </>
+                                    )}
                                 </CardContent>
                             </Card>
 
                             <Card className="border-sidebar-border/70 py-4">
                                 <CardHeader>
                                     <CardTitle>Activity Timeline</CardTitle>
+                                    <CardDescription>Current-cycle allocation events.</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="flex h-20 items-end gap-2">
-                                        <div className="w-full rounded-t bg-sky-500/60" style={{ height: '38%' }} />
-                                        <div className="w-full rounded-t bg-sky-500/60" style={{ height: '62%' }} />
-                                        <div className="w-full rounded-t bg-sky-500/60" style={{ height: '47%' }} />
-                                        <div className="w-full rounded-t bg-sky-500/60" style={{ height: '79%' }} />
-                                        <div className="w-full rounded-t bg-sky-500/60" style={{ height: '54%' }} />
-                                    </div>
+                                    {isLoadingSnapshot ? (
+                                        <div className="h-20 animate-pulse rounded-xl bg-muted" />
+                                    ) : timelinePoints.length === 0 ? (
+                                        <p className="text-sm text-muted-foreground">No events recorded yet.</p>
+                                    ) : (
+                                        <div className="flex h-20 items-end gap-2">
+                                            {timelinePoints.map((point) => {
+                                                const height = Math.max(
+                                                    8,
+                                                    Math.round((point.amount / maxTimelineAmount) * 100),
+                                                );
+
+                                                return (
+                                                    <div
+                                                        key={point.date}
+                                                        className="flex-1 rounded-t bg-sky-500/60"
+                                                        style={{ height: `${height}%` }}
+                                                        title={`${point.date}: ${formatWholeDollars(point.amount)}`}
+                                                    />
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
 
@@ -95,11 +268,25 @@ export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
                                     <CardTitle>Cycle Progress</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-2">
-                                    <p className="text-sm text-muted-foreground">Day 11 of 31</p>
-                                    <div className="h-2 overflow-hidden rounded-full bg-muted">
-                                        <div className="h-full w-[35%] bg-indigo-500/70" />
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">35% complete</p>
+                                    {isLoadingSnapshot ? (
+                                        <div className="space-y-2">
+                                            <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+                                            <div className="h-2 animate-pulse rounded-full bg-muted" />
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <p className="text-sm text-muted-foreground">
+                                                Day {cycleDay} of {cycleTotalDays}
+                                            </p>
+                                            <div className="h-2 overflow-hidden rounded-full bg-muted">
+                                                <div
+                                                    className="h-full bg-indigo-500/70"
+                                                    style={{ width: `${cyclePercent}%` }}
+                                                />
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">{cyclePercent}% complete</p>
+                                        </>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>

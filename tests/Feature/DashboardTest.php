@@ -29,6 +29,7 @@ class DashboardTest extends TestCase
                 ->component('dashboard')
                 ->where('workspace.layout', 'chat_dashboard_columns')
                 ->where('workspace.chat_panel_enabled', true)
-                ->where('workspace.widgets_enabled', true));
+                ->where('workspace.widgets_enabled', true)
+                ->where('workspace.snapshot_url', route('dashboard.snapshot')));
     }
 }

@@ -307,5 +307,11 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
   - Run `vendor/bin/pint --dirty --format agent` before creating the PR.
   - Open exactly one PR per issue and link it to that issue.
 - After opening a PR, stop and wait for explicit user review/approval before starting the next issue.
+- After a PR is merged:
+  - Checkout `main` and pull latest with fast-forward only.
+  - Delete the merged feature branch from `origin`.
+  - Delete the merged local feature branch.
+  - Prune stale remote-tracking refs.
+  - Start the next issue from a fresh `codex/` branch based on updated `main`.
 - Do not batch multiple issues into a single PR unless explicitly requested by the user.
 - Keep implementation aligned with `/Users/trq/src/trq/flv2/BUDGET_AI_V1_SPEC.md`; if scope conflicts are found, pause and ask the user before proceeding.

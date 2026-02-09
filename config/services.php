@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'ai' => [
+        'intent_provider' => env('AI_INTENT_PROVIDER', 'openrouter'),
+        'intent_model' => env('AI_INTENT_MODEL', 'anthropic/sonnet'),
+        'intent_timeout' => (int) env('AI_INTENT_TIMEOUT', 30),
+    ],
+
 ];

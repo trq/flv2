@@ -3,6 +3,7 @@
 namespace App\Domain\Budgeting\Goals;
 
 use App\Domain\Budgeting\Exceptions\InsufficientSavingsPoolFunds;
+use DateTimeImmutable;
 
 class SavingsPoolAccountingService
 {
@@ -50,6 +51,38 @@ class SavingsPoolAccountingService
             'current_balance' => $currentSavingsPoolBalance,
             'projected_balance' => $currentSavingsPoolBalance + $plannedNetChange,
             'planned_net_change' => $plannedNetChange,
+        ];
+    }
+
+    /**
+     * @param  array<int, array{
+     *   event_date: DateTimeImmutable,
+     *   amount: int
+     * }>  $plannedSavingsEvents
+     * @return array{
+     *   current_balance: int,
+     *   forecast_date: string,
+     *   included_net_change: int,
+     *   included_event_count: int,
+     *   projected_balance: int
+     * }
+     */
+    public function forecastSavingsPoolBalanceByDate(
+        int $currentSavingsPoolBalance,
+        DateTimeImmutable $forecastDate,
+        array $plannedSavingsEvents,
+    ): array {
+        $includedEvents = collect($plannedSavingsEvents)
+            ->filter(fn (array $event): bool => $event['event_date'] <= $forecastDate)
+            ->values();
+        $includedNetChange = $includedEvents->sum('amount');
+
+        return [
+            'current_balance' => $currentSavingsPoolBalance,
+            'forecast_date' => $forecastDate->format('Y-m-d'),
+            'included_net_change' => $includedNetChange,
+            'included_event_count' => $includedEvents->count(),
+            'projected_balance' => $currentSavingsPoolBalance + $includedNetChange,
         ];
     }
 }

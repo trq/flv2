@@ -57,3 +57,25 @@ it('projects savings pool balances across cycles from current balance and planne
         'planned_net_change' => 250,
     ]);
 });
+
+it('forecasts savings pool balance by date across multiple cycles', function () {
+    $service = new SavingsPoolAccountingService;
+
+    $forecast = $service->forecastSavingsPoolBalanceByDate(
+        currentSavingsPoolBalance: 500,
+        forecastDate: new DateTimeImmutable('2026-04-15'),
+        plannedSavingsEvents: [
+            ['event_date' => new DateTimeImmutable('2026-03-20'), 'amount' => 200],
+            ['event_date' => new DateTimeImmutable('2026-04-14'), 'amount' => 150],
+            ['event_date' => new DateTimeImmutable('2026-04-16'), 'amount' => -50],
+        ],
+    );
+
+    expect($forecast)->toBe([
+        'current_balance' => 500,
+        'forecast_date' => '2026-04-15',
+        'included_net_change' => 350,
+        'included_event_count' => 2,
+        'projected_balance' => 850,
+    ]);
+});

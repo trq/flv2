@@ -74,9 +74,11 @@ return new class extends Migration
             'alert_rules' => [
                 ['fields' => ['budget_id' => 1, 'goal_id' => 1], 'options' => []],
                 ['fields' => ['budget_id' => 1, 'is_active' => 1], 'options' => []],
+                ['fields' => ['user_id' => 1, 'is_active' => 1], 'options' => []],
             ],
             'alerts' => [
                 ['fields' => ['budget_id' => 1, 'cycle_id' => 1, 'resolved_at' => 1], 'options' => []],
+                ['fields' => ['user_id' => 1, 'resolved_at' => 1], 'options' => []],
                 ['fields' => ['dedupe_key' => 1], 'options' => ['unique' => true]],
             ],
         ];

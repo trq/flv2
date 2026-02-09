@@ -22,6 +22,7 @@ class AlertRuleFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => (string) $this->faker->numberBetween(1, 9999),
             'budget_id' => 'budget_'.$this->faker->randomNumber(3),
             'goal_id' => 'goal_'.$this->faker->randomNumber(3),
             'cycle_id' => 'cycle_'.$this->faker->randomNumber(3),

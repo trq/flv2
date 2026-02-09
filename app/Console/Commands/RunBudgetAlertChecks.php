@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Domain\Budgeting\Alerts\BudgetAlertCheckService;
+use App\Models\User;
+use App\Notifications\BudgetAlertTriggeredNotification;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 
@@ -27,8 +29,29 @@ class RunBudgetAlertChecks extends Command
         $windowStart = $windowEnd->subHours($windowHours);
 
         $createdAlerts = $this->budgetAlertCheckService->runWindow($windowStart, $windowEnd);
+        $sentNotifications = 0;
 
-        $this->info("Created {$createdAlerts} alerts for {$windowStart->toDateTimeString()} to {$windowEnd->toDateTimeString()}.");
+        foreach ($createdAlerts as $alert) {
+            $userId = $alert->getAttribute('user_id');
+
+            if (! is_string($userId) || $userId === '') {
+                continue;
+            }
+
+            $user = User::query()->find($userId);
+
+            if ($user === null) {
+                continue;
+            }
+
+            $user->notify(new BudgetAlertTriggeredNotification($alert));
+            $sentNotifications++;
+        }
+
+        $createdAlertCount = $createdAlerts->count();
+
+        $this->info("Created {$createdAlertCount} alerts for {$windowStart->toDateTimeString()} to {$windowEnd->toDateTimeString()}.");
+        $this->info("Sent {$sentNotifications} in-app notifications.");
 
         return self::SUCCESS;
     }

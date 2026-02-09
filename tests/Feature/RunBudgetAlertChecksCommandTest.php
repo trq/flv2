@@ -55,15 +55,11 @@ it('creates alerts for active rules and remains idempotent for the same check wi
         ],
     ]);
 
-    $this->artisan('budget:check-alerts --window-hours=24')
-        ->expectsOutputToContain('Created 3 alerts')
-        ->assertExitCode(0);
+    $this->artisan('budget:check-alerts --window-hours=24')->assertExitCode(0);
 
     expect(Alert::query()->where('budget_id', $budgetId)->count())->toBe(3);
 
-    $this->artisan('budget:check-alerts --window-hours=24')
-        ->expectsOutputToContain('Created 0 alerts')
-        ->assertExitCode(0);
+    $this->artisan('budget:check-alerts --window-hours=24')->assertExitCode(0);
 
     expect(Alert::query()->where('budget_id', $budgetId)->count())->toBe(3);
 

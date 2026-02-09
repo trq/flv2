@@ -20,6 +20,7 @@ class AlertRule extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
         'budget_id',
         'goal_id',
         'cycle_id',

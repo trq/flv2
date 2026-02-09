@@ -8,15 +8,17 @@ use App\Models\Alert;
 use App\Models\AlertRule;
 use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
+use Illuminate\Support\Collection;
 
 class BudgetAlertCheckService
 {
     /**
-     * @return int Number of alerts created for this window.
+     * @return Collection<int, Alert>
      */
-    public function runWindow(CarbonImmutable $windowStart, CarbonImmutable $windowEnd): int
+    public function runWindow(CarbonImmutable $windowStart, CarbonImmutable $windowEnd): Collection
     {
-        $createdAlertCount = 0;
+        /** @var Collection<int, Alert> $createdAlerts */
+        $createdAlerts = collect();
 
         /** @var \Illuminate\Support\Collection<int, AlertRule> $rules */
         $rules = AlertRule::query()
@@ -35,6 +37,7 @@ class BudgetAlertCheckService
                     'dedupe_key' => $this->dedupeKey($rule, $windowStart, $windowEnd),
                 ],
                 [
+                    'user_id' => $rule->getAttribute('user_id'),
                     'budget_id' => (string) $rule->getAttribute('budget_id'),
                     'cycle_id' => $rule->getAttribute('cycle_id'),
                     'goal_id' => $rule->getAttribute('goal_id'),
@@ -49,11 +52,11 @@ class BudgetAlertCheckService
             );
 
             if ($alert->wasRecentlyCreated) {
-                $createdAlertCount++;
+                $createdAlerts->push($alert);
             }
         }
 
-        return $createdAlertCount;
+        return $createdAlerts;
     }
 
     /**

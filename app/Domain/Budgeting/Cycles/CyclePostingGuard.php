@@ -13,7 +13,7 @@ class CyclePostingGuard
             throw NonCurrentCyclePostingNotAllowed::create();
         }
 
-        if ($cycleState === CycleState::Closed) {
+        if ($cycleState === CycleState::CLOSED) {
             throw ClosedCycleReadOnly::create();
         }
     }

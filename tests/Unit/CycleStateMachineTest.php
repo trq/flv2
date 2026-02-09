@@ -12,7 +12,7 @@ it('allows posting to the current open cycle', function () {
     $guard = new CyclePostingGuard;
 
     $guard->assertCanPostAllocation(
-        cycleState: CycleState::Open,
+        cycleState: CycleState::OPEN,
         isCurrentCycle: true,
     );
 
@@ -23,7 +23,7 @@ it('rejects posting allocations to closed cycles', function () {
     $guard = new CyclePostingGuard;
 
     $guard->assertCanPostAllocation(
-        cycleState: CycleState::Closed,
+        cycleState: CycleState::CLOSED,
         isCurrentCycle: true,
     );
 })->throws(ClosedCycleReadOnly::class, 'closed');
@@ -32,7 +32,7 @@ it('rejects posting allocations to non-current cycles', function () {
     $guard = new CyclePostingGuard;
 
     $guard->assertCanPostAllocation(
-        cycleState: CycleState::Open,
+        cycleState: CycleState::OPEN,
         isCurrentCycle: false,
     );
 })->throws(NonCurrentCyclePostingNotAllowed::class, 'current');
@@ -42,7 +42,7 @@ it('opens a cycle when no other cycle is currently open for the budget', functio
 
     $newState = $stateMachine->openCycle(existingOpenCycleCount: 0);
 
-    expect($newState)->toBe(CycleState::Open);
+    expect($newState)->toBe(CycleState::OPEN);
 });
 
 it('rejects opening a cycle when the budget already has an open cycle', function () {
@@ -54,13 +54,13 @@ it('rejects opening a cycle when the budget already has an open cycle', function
 it('transitions an open cycle to closed', function () {
     $stateMachine = new CycleStateMachine;
 
-    $nextState = $stateMachine->closeCycle(currentState: CycleState::Open);
+    $nextState = $stateMachine->closeCycle(currentState: CycleState::OPEN);
 
-    expect($nextState)->toBe(CycleState::Closed);
+    expect($nextState)->toBe(CycleState::CLOSED);
 });
 
 it('rejects invalid close transitions for non-open cycles', function () {
     $stateMachine = new CycleStateMachine;
 
-    $stateMachine->closeCycle(currentState: CycleState::Closed);
+    $stateMachine->closeCycle(currentState: CycleState::CLOSED);
 })->throws(InvalidCycleStateTransition::class, 'cannot transition');

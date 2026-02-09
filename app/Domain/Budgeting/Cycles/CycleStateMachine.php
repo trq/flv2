@@ -13,18 +13,18 @@ class CycleStateMachine
             throw MultipleOpenCyclesNotAllowed::forOpenCycleCount($existingOpenCycleCount);
         }
 
-        return CycleState::Open;
+        return CycleState::OPEN;
     }
 
     public function closeCycle(CycleState $currentState): CycleState
     {
-        if ($currentState !== CycleState::Open) {
+        if ($currentState !== CycleState::OPEN) {
             throw InvalidCycleStateTransition::forTransition(
                 from: $currentState,
-                to: CycleState::Closed,
+                to: CycleState::CLOSED,
             );
         }
 
-        return CycleState::Closed;
+        return CycleState::CLOSED;
     }
 }

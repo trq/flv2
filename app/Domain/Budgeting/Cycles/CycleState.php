@@ -4,6 +4,6 @@ namespace App\Domain\Budgeting\Cycles;
 
 enum CycleState: string
 {
-    case Open = 'open';
-    case Closed = 'closed';
+    case OPEN = 'open';
+    case CLOSED = 'closed';
 }

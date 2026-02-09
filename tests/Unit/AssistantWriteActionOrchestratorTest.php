@@ -145,3 +145,49 @@ it('returns deterministic rejection payload when user rejects write', function (
         ])
         ->and($result['confirmation_card']['result_status'])->toBe('rejected');
 });
+
+it('returns failed payload with confirmation-card schema when write execution returns false', function () {
+    $orchestrator = new AssistantWriteOrchestrator;
+
+    $result = $orchestrator->run(
+        proposal: sampleWriteProposal(),
+        policy: new AssistantWritePolicy(AssistantWriteExecutionMode::CONFIRMATION_ONLY),
+        decision: AssistantWriteDecision::APPROVE,
+        executeWrite: fn (): bool => false,
+    )->toArray();
+
+    expect($result['status'])->toBe('failed')
+        ->and($result['requires_confirmation'])->toBeFalse()
+        ->and($result['error'])->toBe([
+            'code' => 'write_execution_failed',
+            'message' => 'Write action execution failed.',
+        ])
+        ->and($result['confirmation_card'])->toHaveKeys([
+            'proposal_id',
+            'action_summary',
+            'entities',
+            'result_status',
+        ])
+        ->and($result['confirmation_card']['result_status'])->toBe('failed');
+});
+
+it('returns failed payload with deterministic error when write execution throws', function () {
+    $orchestrator = new AssistantWriteOrchestrator;
+
+    $result = $orchestrator->run(
+        proposal: sampleWriteProposal(),
+        policy: new AssistantWritePolicy(AssistantWriteExecutionMode::CONFIRMATION_ONLY),
+        decision: AssistantWriteDecision::APPROVE,
+        executeWrite: function (): bool {
+            throw new RuntimeException('boom');
+        },
+    )->toArray();
+
+    expect($result['status'])->toBe('failed')
+        ->and($result['requires_confirmation'])->toBeFalse()
+        ->and($result['error'])->toBe([
+            'code' => 'write_execution_failed',
+            'message' => 'Write action execution failed.',
+        ])
+        ->and($result['confirmation_card']['result_status'])->toBe('failed');
+});

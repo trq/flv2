@@ -305,7 +305,8 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
   - Follow TDD: write or update failing tests first, then implement, then make tests pass.
   - Run only the minimum affected tests using `php artisan test --compact ...`.
   - Run `vendor/bin/pint --dirty --format agent` before creating the PR.
-  - Open exactly one PR per issue and link it to that issue.
+  - Pause before any commit and let the user review the local uncommitted diff in Codex Desktop.
+  - Only after explicit user approval, commit and open exactly one PR per issue linked to that issue.
 - After opening a PR, stop and wait for explicit user review/approval before starting the next issue.
 - After a PR is merged:
   - Checkout `main` and pull latest with fast-forward only.
@@ -315,3 +316,9 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
   - Start the next issue from a fresh `codex/` branch based on updated `main`.
 - Do not batch multiple issues into a single PR unless explicitly requested by the user.
 - Keep implementation aligned with `/Users/trq/src/trq/flv2/BUDGET_AI_V1_SPEC.md`; if scope conflicts are found, pause and ask the user before proceeding.
+
+## Money Modeling Rule (Flowly)
+
+- Flowly only supports whole-dollar monetary values in V1.
+- Store all money amounts as signed integers (no decimal/floating-point money fields).
+- Apply this rule consistently across goals, allocation events, calculations, validation, persistence, and UI rendering.

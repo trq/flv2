@@ -1,8 +1,8 @@
-# Budget AI V1 Specification
+# Flowly Budget AI V1 Specification
 
 ## 1. Objective
 
-Build an AI-first budgeting app in Laravel + Inertia React where users define cycle-based goals and record immutable allocation events through chat or UI.
+Build Flowly, an AI-first budgeting app in Laravel + Inertia React where users define cycle-based goals and record immutable allocation events through chat or UI.
 
 The system must:
 
@@ -56,6 +56,9 @@ Out of scope for V1:
   - timezone
   - week start
   - cycle template (for example 15th -> 14th)
+- Money precision rule (V1):
+  - whole-dollar amounts only (no cents)
+  - stored and computed as signed integers
 
 ### 3.2 Cycle
 
@@ -86,7 +89,7 @@ Out of scope for V1:
   - cycle_id
   - goal_id
   - type (income/expense/savings inferred from goal)
-  - amount (signed decimal)
+  - amount (signed integer whole dollars)
   - status (`pending` or `reconciled`)
   - created_at (system timestamp only; no backdating)
 - Optional fields:
@@ -128,6 +131,7 @@ Out of scope for V1:
 8. Pending events must be resolved before cycle close.
 9. No event can be posted to a past cycle.
 10. All write actions produce a chat confirmation card.
+11. Money values must remain whole-dollar signed integers end-to-end.
 
 ## 5. Savings Target-by-Date Behavior
 

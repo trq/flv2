@@ -32,6 +32,7 @@ Use immediately after a PR is merged and before starting the next issue.
 
 - Create a fresh issue branch from updated main:
   - `git checkout -b codex/issue-<number>-<short-slug>`
+- Before any commit on the next issue, require user local pre-commit diff review in Codex Desktop.
 
 ## Guardrails
 

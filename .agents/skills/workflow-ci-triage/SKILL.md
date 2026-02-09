@@ -25,7 +25,10 @@ Use when a PR has failing CI/lint/test checks.
 4. Reproduce locally with the narrowest command possible.
 5. Apply minimal fix; avoid unrelated refactors.
 6. Re-run targeted tests and `vendor/bin/pint --dirty --format agent`.
-7. Push and re-check:
+7. Pause for local review before commit/push:
+   - present local uncommitted diff/status in Codex Desktop
+   - wait for explicit user approval
+8. Push and re-check:
    - `gh pr checks <pr-number> --watch --interval 10`
 
 ## Output Expectations
@@ -39,3 +42,5 @@ Use when a PR has failing CI/lint/test checks.
 - Prefer fixing lockfile/config incompatibilities over weakening CI.
 - Avoid broad workflow changes unless required by root cause.
 - Keep fixes scoped to the active PR/issue.
+- Do not commit before user-approved local pre-commit review.
+- Enforce Flowly money modeling: whole-dollar signed integers only.

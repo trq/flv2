@@ -21,7 +21,10 @@ Use before writing code for a new issue.
 4. Decide test scope first:
    - unit vs feature
    - minimum affected files
-5. Define implementation slice:
+5. Apply Flowly money rule to scope:
+   - all money values are signed whole-dollar integers
+   - reject decimal/floating-point money handling in new code/tests
+6. Define implementation slice:
    - smallest set of classes/functions needed to pass tests.
 
 ## Deliverable for Kickoff

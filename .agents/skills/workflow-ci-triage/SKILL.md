@@ -25,6 +25,7 @@ Use when a PR has failing CI/lint/test checks.
 4. Reproduce locally with the narrowest command possible.
 5. Apply minimal fix; avoid unrelated refactors.
 6. Re-run targeted tests and `vendor/bin/pint --dirty --format agent`.
+   - run `composer analyse` when PHP static analysis checks are part of the failure.
 7. Pause for local review before commit/push:
    - present local uncommitted diff/status in Codex Desktop
    - wait for explicit user approval

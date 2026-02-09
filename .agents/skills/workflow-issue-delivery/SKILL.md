@@ -32,6 +32,7 @@ Use this skill when implementing milestone issues in this repository.
 6. Validate:
    - run minimal affected tests with `php artisan test --compact ...`
    - run `vendor/bin/pint --dirty --format agent`
+   - run `composer analyse` for PHP-domain changes
 7. Pause for local review before commit:
    - present uncommitted diff/status for user review in Codex Desktop
    - wait for explicit user approval

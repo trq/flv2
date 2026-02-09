@@ -304,6 +304,7 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
   - Follow TDD: write or update failing tests first, then implement, then make tests pass.
   - Run only the minimum affected tests using `php artisan test --compact ...`.
   - Run `vendor/bin/pint --dirty --format agent` before any commit.
+  - Run `composer analyse` before any commit for PHP-domain changes.
   - Pause before any commit and let the user review the local uncommitted diff in Codex Desktop.
   - Choose integration mode after user approval:
     - `direct-to-main` (default for low-risk tasks): commit on `main` and push.

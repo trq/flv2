@@ -15,12 +15,17 @@ type Props = {
     status?: string;
     canResetPassword: boolean;
     canRegister: boolean;
+    socialProviders: {
+        google: string;
+        apple: string;
+    };
 };
 
 export default function Login({
     status,
     canResetPassword,
     canRegister,
+    socialProviders,
 }: Props) {
     return (
         <AuthLayout
@@ -106,6 +111,26 @@ export default function Login({
                                 </TextLink>
                             </div>
                         )}
+
+                        <div className="space-y-3">
+                            <div className="text-center text-xs uppercase tracking-wide text-muted-foreground">
+                                Or continue with
+                            </div>
+                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                <a
+                                    href={socialProviders.google}
+                                    className="inline-flex w-full items-center justify-center rounded-md border border-input px-4 py-2 text-sm font-medium transition hover:bg-accent hover:text-accent-foreground"
+                                >
+                                    Google
+                                </a>
+                                <a
+                                    href={socialProviders.apple}
+                                    className="inline-flex w-full items-center justify-center rounded-md border border-input px-4 py-2 text-sm font-medium transition hover:bg-accent hover:text-accent-foreground"
+                                >
+                                    Apple
+                                </a>
+                            </div>
+                        </div>
                     </>
                 )}
             </Form>

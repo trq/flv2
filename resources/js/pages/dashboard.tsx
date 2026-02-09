@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
+import { ChatCardRenderer, type ChatCardPayload } from '@/components/chat-card-renderer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
@@ -45,6 +46,7 @@ type DashboardWorkspaceProps = {
         chat_panel_enabled: boolean;
         widgets_enabled: boolean;
         snapshot_url: string;
+        chat_cards: ChatCardPayload[];
     };
 };
 
@@ -152,6 +154,11 @@ export default function Dashboard({ workspace }: DashboardWorkspaceProps) {
                                     </div>
                                     <div className="max-w-[85%] rounded-lg bg-secondary px-3 py-2 text-sm">
                                         Logged to Groceries. You are 95% away from this cycle cap.
+                                    </div>
+                                    <div className="space-y-3">
+                                        {workspace.chat_cards.map((card) => (
+                                            <ChatCardRenderer key={card.id} card={card} />
+                                        ))}
                                     </div>
                                 </div>
                                 <div className="rounded-xl border border-border bg-background px-4 py-3 text-sm text-muted-foreground">

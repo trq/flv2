@@ -22,6 +22,7 @@ test('budgeting mongo migration defines required collections and indexes', funct
     $migration = require $migrationPath;
 
     expect(method_exists($migration, 'collectionIndexes'))->toBeTrue();
+    expect(method_exists($migration, 'shouldRunMigration'))->toBeFalse();
 
     /** @var array<string, array<int, array<string, mixed>>> $collectionIndexes */
     $collectionIndexes = $migration->collectionIndexes();

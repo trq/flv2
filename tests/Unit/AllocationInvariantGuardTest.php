@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Domain\Budgeting\Exceptions\ExpenseGoalCapExceeded;
 use App\Domain\Budgeting\Exceptions\InsufficientPoolFunds;
-use App\Domain\Budgeting\Exceptions\NonWholeDollarAmount;
 use App\Domain\Budgeting\Ledger\AllocationInvariantGuard;
 
 it('rejects allocation attempts that exceed available funded pool', function () {
@@ -69,7 +70,7 @@ it('rejects non-integer allocation amounts for whole-dollar policy', function ()
         allocationAmount: 75.25,
         consumesPool: true,
     );
-})->throws(NonWholeDollarAmount::class, 'allocationAmount');
+})->throws(TypeError::class);
 
 it('rejects non-integer pool components when calculating availability', function () {
     $guard = new AllocationInvariantGuard;
@@ -79,4 +80,4 @@ it('rejects non-integer pool components when calculating availability', function
         reconciledPoolUsageTotal: 1_250.50,
         pendingPoolUsageTotal: 300,
     );
-})->throws(NonWholeDollarAmount::class, 'reconciledPoolUsageTotal');
+})->throws(TypeError::class);

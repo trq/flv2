@@ -11,10 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! $this->shouldRunMigration()) {
-            return;
-        }
-
         foreach ($this->collectionIndexes() as $collection => $indexes) {
             Schema::connection('mongodb')->create($collection, function (Blueprint $blueprint) use ($indexes): void {
                 foreach ($indexes as $index) {
@@ -29,10 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (! $this->shouldRunMigration()) {
-            return;
-        }
-
         foreach (array_keys($this->collectionIndexes()) as $collection) {
             Schema::connection('mongodb')->dropIfExists($collection);
         }
@@ -87,10 +79,5 @@ return new class extends Migration
                 ['fields' => ['budget_id' => 1, 'cycle_id' => 1, 'resolved_at' => 1], 'options' => []],
             ],
         ];
-    }
-
-    private function shouldRunMigration(): bool
-    {
-        return config('database.default') === 'mongodb';
     }
 };

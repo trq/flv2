@@ -1,7 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Domain\Budgeting\Exceptions\AllocationEventMutationNotAllowed;
-use App\Domain\Budgeting\Exceptions\NonWholeDollarAmount;
 use App\Domain\Budgeting\Ledger\AllocationEventJournal;
 use App\Domain\Budgeting\Ledger\AllocationEventMutationGuard;
 
@@ -94,4 +95,4 @@ it('rejects non-integer event amounts for whole-dollar policy', function () {
         cycleId: 'cycle_2026_02',
         amount: 40.75,
     );
-})->throws(NonWholeDollarAmount::class, 'signed whole-dollar integer');
+})->throws(TypeError::class);

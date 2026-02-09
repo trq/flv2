@@ -2,14 +2,13 @@
 
 namespace App\Domain\Budgeting\Cycles;
 
-use App\Domain\Budgeting\Exceptions\NonWholeDollarAmount;
 use DateInterval;
 use DateTimeImmutable;
 
 class CycleRolloverOrchestrator
 {
     /**
-     * @param  array<int, array{event_id: string, goal_id: string, amount: int|float|string}>  $adjustmentSweepEvents
+     * @param  array<int, array{event_id: string, goal_id: string, amount: int}>  $adjustmentSweepEvents
      */
     public function runConfirmedClose(
         string $budgetId,
@@ -19,27 +18,19 @@ class CycleRolloverOrchestrator
         DateTimeImmutable $currentCycleEnd,
         string $nextCycleIncomeAdjustmentGoalId,
         string $rolloverEventId,
-        int|float|string $rolloverAmount,
+        int $rolloverAmount,
         array $adjustmentSweepEvents,
     ): CycleRolloverResult {
-        $validatedRolloverAmount = $this->assertWholeDollarAmount(
-            amount: $rolloverAmount,
-            field: 'rolloverAmount',
-        );
-
         $nextCycle = $this->nextCycleWindow($nextCycleId, $currentCycleStart, $currentCycleEnd);
         $generatedEvents = [];
 
-        foreach ($adjustmentSweepEvents as $index => $event) {
+        foreach ($adjustmentSweepEvents as $event) {
             $generatedEvents[] = $this->buildGeneratedEvent(
                 eventId: $event['event_id'],
                 budgetId: $budgetId,
                 cycleId: $currentCycleId,
                 goalId: $event['goal_id'],
-                amount: $this->assertWholeDollarAmount(
-                    amount: $event['amount'],
-                    field: sprintf('adjustmentSweepEvents[%d].amount', $index),
-                ),
+                amount: $event['amount'],
                 source: CycleGeneratedEventSource::ADJUSTMENT_SWEEP,
             );
         }
@@ -49,7 +40,7 @@ class CycleRolloverOrchestrator
             budgetId: $budgetId,
             cycleId: $nextCycleId,
             goalId: $nextCycleIncomeAdjustmentGoalId,
-            amount: $validatedRolloverAmount,
+            amount: $rolloverAmount,
             source: CycleGeneratedEventSource::ROLLOVER_INCOME_ADJUSTMENT,
         );
 
@@ -58,7 +49,7 @@ class CycleRolloverOrchestrator
             closeSummary: [
                 'current_cycle_id' => $currentCycleId,
                 'next_cycle_id' => $nextCycleId,
-                'rollover_amount' => $validatedRolloverAmount,
+                'rollover_amount' => $rolloverAmount,
             ],
             generatedEvents: $generatedEvents,
         );
@@ -128,14 +119,5 @@ class CycleRolloverOrchestrator
                 'source' => CycleGeneratedEventMetadataSource::CYCLE_CLOSE_CONFIRMATION->value,
             ],
         ];
-    }
-
-    private function assertWholeDollarAmount(int|float|string $amount, string $field): int
-    {
-        if (! is_int($amount)) {
-            throw NonWholeDollarAmount::forField($field, $amount);
-        }
-
-        return $amount;
     }
 }

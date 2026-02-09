@@ -3,7 +3,6 @@
 namespace App\Domain\Budgeting\Ledger;
 
 use App\Domain\Budgeting\Exceptions\AllocationEventNotFound;
-use App\Domain\Budgeting\Exceptions\NonWholeDollarAmount;
 
 class AllocationEventJournal
 {
@@ -31,16 +30,14 @@ class AllocationEventJournal
         string $eventId,
         string $goalId,
         string $cycleId,
-        int|float|string $amount,
+        int $amount,
         ?string $compensatesEventId = null,
     ): array {
-        $validatedAmount = $this->assertWholeDollarAmount($amount);
-
         $event = [
             'event_id' => $eventId,
             'goal_id' => $goalId,
             'cycle_id' => $cycleId,
-            'amount' => $validatedAmount,
+            'amount' => $amount,
             'compensates_event_id' => $compensatesEventId,
         ];
 
@@ -103,14 +100,5 @@ class AllocationEventJournal
         }
 
         throw AllocationEventNotFound::forEventId($eventId);
-    }
-
-    private function assertWholeDollarAmount(int|float|string $amount): int
-    {
-        if (! is_int($amount)) {
-            throw NonWholeDollarAmount::forField('amount', $amount);
-        }
-
-        return $amount;
     }
 }

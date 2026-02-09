@@ -35,4 +35,22 @@ return [
         ],
     ],
 
+    'ai' => [
+        'intent_provider' => env('AI_INTENT_PROVIDER', 'openrouter'),
+        'intent_model' => env('AI_INTENT_MODEL', 'anthropic/sonnet'),
+        'intent_timeout' => (int) env('AI_INTENT_TIMEOUT', 30),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'apple' => [
+        'client_id' => env('APPLE_CLIENT_ID'),
+        'client_secret' => env('APPLE_CLIENT_SECRET'),
+        'redirect' => env('APPLE_REDIRECT_URI'),
+    ],
+
 ];

@@ -51,6 +51,10 @@ class FortifyServiceProvider extends ServiceProvider
             'canResetPassword' => Features::enabled(Features::resetPasswords()),
             'canRegister' => Features::enabled(Features::registration()),
             'status' => $request->session()->get('status'),
+            'socialProviders' => [
+                'google' => route('auth.social.redirect', ['provider' => 'google']),
+                'apple' => route('auth.social.redirect', ['provider' => 'apple']),
+            ],
         ]));
 
         Fortify::resetPasswordView(fn (Request $request) => Inertia::render('auth/reset-password', [

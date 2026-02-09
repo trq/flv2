@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -22,6 +23,17 @@ class DashboardTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->get(route('dashboard'));
-        $response->assertOk();
+        $response
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('dashboard')
+                ->where('workspace.layout', 'chat_dashboard_columns')
+                ->where('workspace.chat_panel_enabled', true)
+                ->where('workspace.widgets_enabled', true)
+                ->where('workspace.snapshot_url', route('dashboard.snapshot'))
+                ->where('workspace.chat_cards.0.type', 'write_confirmation')
+                ->where('workspace.chat_cards.1.type', 'blocked_action')
+                ->where('workspace.chat_cards.2.type', 'metrics')
+                ->where('workspace.chat_cards.2.payload.burn_rate_percent', 88));
     }
 }

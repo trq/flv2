@@ -8,6 +8,7 @@ test('mongodb connection is configured for the budgeting domain', function () {
     expect($mongodbConnection)
         ->toBeArray()
         ->and(Arr::get($mongodbConnection, 'driver'))->toBe('mongodb')
+        ->and(Arr::get($mongodbConnection, 'port'))->toBe(27018)
         ->and(Arr::get($mongodbConnection, 'database'))->toBeString();
 });
 

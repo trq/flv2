@@ -117,7 +117,7 @@ return [
             'driver' => 'mongodb',
             'dsn' => env('MONGODB_URI'),
             'host' => env('MONGODB_HOST', '127.0.0.1'),
-            'port' => (int) env('MONGODB_PORT', 27017),
+            'port' => (int) env('MONGODB_PORT', 27018),
             'database' => env('MONGODB_DATABASE', 'flv2'),
             'username' => env('MONGODB_USERNAME'),
             'password' => env('MONGODB_PASSWORD'),
